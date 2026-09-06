@@ -44,38 +44,66 @@ Our final development phase will focus on integrating the following key features
     *   **Dashboard Feature:** Develop a feature on the authorities' dashboard that allows for the automated generation of a preliminary Electronic First Information Report (E-FIR) based on collected incident data, streamlining the reporting process.
     
 
-## Getting Started
+## Getting Started & Deployment
 
-*(This section will be expanded once the project is ready for deployment and public access.)*
+This project consists of three parts: a Node.js Backend, a Next.js Live Dashboard (Main Frontend), and a Next.js App Simulator. They are configured to run seamlessly together.
 
-To run the prototype locally, follow these steps:
+### Local Development Setup
 
-1.  **Clone the repository:**
-    ```bash
-    git clone [repository_url]
-    ```
-2.  **Navigate to the app-simulation directory:**
-    ```bash
-    cd app-simulator
-    npm install
-    npm run dev -- -p 3001
-    ```
-    Open [http://localhost:3001/app-simulator](http://localhost:3001/app-simulator) in your browser to view the application.
+To run the entire system locally, open **three separate terminal tabs** in the root directory:
 
-3.  **Navigate to the live-dashboard directory:**
-    ```bash
-    cd live-dashboard
-    npm install
-    npm run dev
-    ```
-    Open [http://localhost:3000/live-dashboard](http://localhost:3000/live-dashboard) in your browser to view the application.
+**1. Start the Backend:**
+```bash
+cd backend
+npm install
+npm start
+```
+*(Runs on http://localhost:5001)*
 
-4.  **Navigate to the backend directory:**
-    ```bash
-    cd backend
-    npm install
-    npm run start
-    ```
+**2. Start the App Simulator:**
+```bash
+cd app-simulation
+npm install
+npm run dev -- -p 3001
+```
+*(Runs on http://localhost:3001)*
+
+**3. Start the Live Dashboard (Main App):**
+```bash
+cd live-dashboard
+npm install
+npm run dev
+```
+*(Runs on http://localhost:3000)*
+
+**Testing Locally:**
+Because of Next.js rewrites, you can test everything from a single URL!
+- Go to `http://localhost:3000` to view the Live Dashboard.
+- Go to `http://localhost:3000/simulator` to view the App Simulator seamlessly!
+
+---
+
+### Cloud Deployment (Vercel & Render)
+
+**1. Deploy Backend to Render:**
+- Create a new Web Service on Render pointing to your GitHub repo.
+- Set Root Directory to `backend`.
+- Build Command: `npm install`, Start Command: `node index.js`.
+- Copy the provided URL (e.g., `https://your-backend.onrender.com`).
+
+**2. Deploy App Simulator to Vercel:**
+- Create a new project on Vercel from your repo.
+- Set Root Directory to `app-simulation`.
+- Add Environment Variable: `NEXT_PUBLIC_API_URL` = `[Your Render Backend URL]`.
+- Deploy and copy the Vercel URL (e.g., `https://your-sim.vercel.app`).
+
+**3. Deploy Live Dashboard to Vercel (Main Site):**
+- Create another project on Vercel from your repo.
+- Set Root Directory to `live-dashboard`.
+- Add Environment Variables:
+  - `NEXT_PUBLIC_API_URL` = `[Your Render Backend URL]`
+  - `SIMULATOR_URL` = `[Your Vercel App Simulator URL]` *(No trailing slash)*
+- Deploy and attach your custom domain!
 
 ## Contribution
 
