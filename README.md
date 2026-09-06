@@ -1,5 +1,7 @@
 ## README: Smart Tourist Safety System (SIH25002)
 
+**🚀 Live Demo:** [https://safesphere-dashboard.vercel.app/](https://safesphere-dashboard.vercel.app/)
+
 ## Project Overview
 
 The Smart Tourist Safety System is an innovative solution designed to enhance the safety and security of tourists by leveraging a powerful fusion of AI, Geo-fencing, and Blockchain technology. This project addresses the SIH Problem Statement SIH25002, aiming to provide a comprehensive, real-time monitoring and alert system for tourist safety.
