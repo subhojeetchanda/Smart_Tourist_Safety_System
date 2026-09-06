@@ -11,7 +11,20 @@ const bcrypt = require("bcryptjs");
 
 // --- Firebase Admin Setup ---
 const admin = require("firebase-admin");
-const serviceAccount = require("./serviceAccountKey.json");
+
+let serviceAccount;
+if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+  // Parse the JSON string from the environment variable (for Render deployment)
+  serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+} else {
+  // Fallback to local file for local development
+  try {
+    serviceAccount = require("./serviceAccountKey.json");
+  } catch (error) {
+    console.error("Error: serviceAccountKey.json not found and FIREBASE_SERVICE_ACCOUNT not set.");
+    process.exit(1);
+  }
+}
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
