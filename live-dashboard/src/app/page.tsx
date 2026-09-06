@@ -29,7 +29,7 @@ export default function PortalPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-5xl z-10">
         
         {/* Live Dashboard Card */}
-        <Link href="/authentication" className="group">
+        <Link href="/dashboard-info" className="group">
           <div className="h-full bg-slate-800/40 backdrop-blur-sm rounded-3xl p-8 border border-slate-700/50 hover:border-blue-500/50 hover:bg-slate-800/80 transition-all duration-500 relative overflow-hidden flex flex-col">
             <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity duration-500 transform group-hover:scale-110">
               <Map className="w-32 h-32 text-blue-400" />
