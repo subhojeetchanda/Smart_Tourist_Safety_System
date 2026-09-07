@@ -237,6 +237,7 @@ app.post("/auth/login", async (req, res) => {
 
 // --- Standard Simulation Routes (Shortened for brevity, logic unchanged) ---
 app.get("/", (req, res) => res.send("<h1>Server Running (Firebase + Google Auth)</h1>"));
+app.get("/ping", (req, res) => res.status(200).json({ status: "alive", message: "Keeping Render awake!", timestamp: new Date().toISOString() }));
 app.get("/reset_simulation", (req, res) => {
   liveTouristData = {}; touristLogs = {}; safetyAlerts = []; anomalyDetectedTourists = new Set(); touristToUserMap = {};
   res.json({ status: "Simulation reset" });
