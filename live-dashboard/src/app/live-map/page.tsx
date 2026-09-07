@@ -32,7 +32,7 @@ export default function DashboardPage() {
   const [resolvingSos, setResolvingSos] = useState<string | null>(null);
   const [showHeatmap, setShowHeatmap] = useState(false);
   const [loadingHeatmap, setLoadingHeatmap] = useState(false);
-  const API_URL = "http://127.0.0.1:5001";
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
 
   // Generate heatmap data from tourist logs
   const heatmapData = useMemo(() => {

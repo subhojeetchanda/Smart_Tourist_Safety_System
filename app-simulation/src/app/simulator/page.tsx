@@ -69,7 +69,7 @@ export default function SimulatorPage() {
   const [individualScores, setIndividualScores] = useState<Record<string, TouristSafetyScore>>({});
   const [liveStatuses, setLiveStatuses] = useState<Record<string, any>>({});
   const [currentUser, setCurrentUser] = useState<{id: string, username: string, pathType: string} | null>(null);
-  const API_URL = "http://127.0.0.1:5001";
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
 
   // Get current user from localStorage
   useEffect(() => {
