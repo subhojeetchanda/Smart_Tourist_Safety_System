@@ -92,6 +92,7 @@ Because of Next.js rewrites, you can test everything from a single URL!
 - Set Root Directory to `backend`.
 - Build Command: `npm install`, Start Command: `node index.js`.
 - Copy the provided URL (e.g., `https://your-backend.onrender.com`).
+- **Keep-Alive (Optional but recommended):** Render's free tier sleeps after 15 minutes of inactivity. We have provided a `/ping` endpoint for this. Create a free account on [cron-job.org](https://cron-job.org/) and set up a cron job to ping `https://[Your Render Backend URL]/ping` every 10-14 minutes to keep the server awake permanently.
 
 **2. Deploy App Simulator to Vercel:**
 - Create a new project on Vercel from your repo.
