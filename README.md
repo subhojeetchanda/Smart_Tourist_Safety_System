@@ -29,6 +29,8 @@ The current prototype provides a complete end-to-end simulation, showcasing the 
     *   The generated reports include a **Live Mini-Map** pinpointing the incident's exact coordinates.
     *   Authorities can instantly generate and download official **PDF Police Reports** directly from the dashboard.
     
+*   **Modern & Premium UI (App Simulator):** The simulator interface has been completely redesigned with a deep dark mode, sleek glassmorphism panels, interactive glow effects, and micro-animations, providing a high-quality presentation experience.
+    
 ## Technical Stack (Current Prototype)
 
 *   **Frontend:** Next.js
