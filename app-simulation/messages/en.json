@@ -66,6 +66,7 @@
     "none": "None",
     "sosActive": "SOS:",
     "active": "Active",
+    "systemDiagnostics": "System Diagnostics",
     "lateNightMonitoring": "Late Night Monitoring",
     "basedOnCurrentTime": "Based on current time",
     "anomalyDetection": "Anomaly Detection",
