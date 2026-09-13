@@ -24,9 +24,11 @@ The current prototype provides a complete end-to-end simulation, showcasing the 
     
 *   **Proactive Safety Alerts (Simulated Mobile App):** Tourists receive proactive safety alerts directly on their simulated mobile app, based on their location, safety score, and detected anomalies.
     
-*   **Functional Tourist Density Heatmap (Authorities' Dashboard):** The authorities' dashboard features a heatmap visualizing the density of tourists in different areas, aiding in resource allocation and identifying potential overcrowding or high-risk zones.
+*   **Automated E-FIR Generation & Reporting:**
+    *   The system automatically triggers an Electronic First Information Report (E-FIR) if a tourist remains in an SOS or anomaly state for a critical duration. 
+    *   The generated reports include a **Live Mini-Map** pinpointing the incident's exact coordinates.
+    *   Authorities can instantly generate and download official **PDF Police Reports** directly from the dashboard.
     
-
 ## Technical Stack (Current Prototype)
 
 *   **Frontend:** Next.js
@@ -42,10 +44,6 @@ Our final development phase will focus on integrating the following key features
 *   **Emergency Contact Alerts (Twilio Integration):**
     *   **Automated SMS/WhatsApp Messages:** Integrate a service like Twilio to automatically send SMS or WhatsApp messages to pre-registered emergency contacts when a tourist raises an SOS alert or a critical safety incident is detected.
     
-*   **Automated E-FIR Generation:**
-    *   **Dashboard Feature:** Develop a feature on the authorities' dashboard that allows for the automated generation of a preliminary Electronic First Information Report (E-FIR) based on collected incident data, streamlining the reporting process.
-    
-
 ## Getting Started & Deployment
 
 This project consists of three parts: a Node.js Backend, a Next.js Live Dashboard (Main Frontend), and a Next.js App Simulator. They are configured to run seamlessly together.
