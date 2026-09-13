@@ -3,16 +3,20 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import LanguageSwitcher from "./LanguageSwitcher";
+import {useTranslations, useLocale} from 'next-intl';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+  const t = useTranslations('Navbar');
+  const locale = useLocale();
 
   // Navigation links organized in an array for cleaner code
   const navLinks = [
-    { href: "/", label: "Home" },
-    { href: "/authentication", label: "App Simulation" },
-    { href: "/about", label: "About" },
+    { href: `/${locale}`, label: t('home') },
+    { href: `/${locale}/authentication`, label: t('appSimulation') },
+    { href: `/${locale}/about`, label: t('about') },
   ];
 
   return (
@@ -21,8 +25,8 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Brand Name */}
           <div className="flex-shrink-0">
-            <Link href="/" className="flex items-center">
-              <span className="text-xl font-bold tracking-wide">SafeSphere</span>
+            <Link href={`/${locale}`} className="flex items-center">
+              <span className="text-xl font-bold tracking-wide">{t('brand')}</span>
             </Link>
           </div>
 
@@ -42,13 +46,14 @@ export default function Navbar() {
           </div>
 
           {/* Right side: Button (Desktop) & Hamburger (Mobile) */}
-          <div className="flex items-center">
+          <div className="flex items-center space-x-4">
+            <LanguageSwitcher />
             <div className="hidden md:block">
               <Link
-                href="/authentication"
+                href={`/${locale}/authentication`}
                 className="px-5 py-2.5 bg-blue-600 text-white font-medium rounded-lg shadow hover:bg-blue-700 transition-all duration-300"
               >
-                SignIn
+                {t('signIn')}
               </Link>
             </div>
             {/* Mobile Menu Button */}
@@ -93,11 +98,11 @@ export default function Navbar() {
           {/* "SignIn" button for mobile */}
           <div className="mt-3 px-2">
              <Link
-                href="/authentication"
+                href={`/${locale}/authentication`}
                 onClick={() => setIsOpen(false)}
                 className="block w-full text-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg shadow hover:bg-blue-700"
               >
-                SignIn
+                {t('signIn')}
               </Link>
           </div>
         </div>

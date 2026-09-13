@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react";
 import dynamic from "next/dynamic";
+import { useTranslations } from "next-intl";
 
 interface TouristData {
   lat: number;
@@ -21,7 +22,7 @@ interface TouristLog {
 
 type TouristsResponse = Record<string, TouristData>;
 
-const MapWrapper = dynamic(() => import("../../components/Map"), { ssr: false });
+const MapWrapper = dynamic(() => import("@/components/Map"), { ssr: false });
 
 export default function DashboardPage() {
   const [tourists, setTourists] = useState<TouristsResponse>({});
@@ -33,6 +34,7 @@ export default function DashboardPage() {
   const [showHeatmap, setShowHeatmap] = useState(false);
   const [loadingHeatmap, setLoadingHeatmap] = useState(false);
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
+  const t = useTranslations("LiveMap");
 
   // Generate heatmap data from tourist logs
   const heatmapData = useMemo(() => {
@@ -185,7 +187,7 @@ export default function DashboardPage() {
       
       // Check if the endpoint exists
       if (res.status === 404) {
-        setError("Logs endpoint not available. Please check if the backend server is running with the latest version.");
+        setError(t("errorLog"));
         return;
       }
       
@@ -287,7 +289,7 @@ export default function DashboardPage() {
         <aside className="w-full sm:w-2/5 lg:w-1/3 bg-[#0f172a] border-t sm:border-l sm:border-t-0 shadow-inner p-4 overflow-y-auto">
           <div className="flex justify-between items-center mb-4">
             <h2 className="font-semibold text-lg text-white">
-              Active Tourists
+              {t("activeTourists")}
             </h2>
             <button
               onClick={handleHeatmapToggle}
@@ -304,15 +306,15 @@ export default function DashboardPage() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  Loading...
+                  {t("loading")}
                 </>
-              ) : showHeatmap ? "Hide Heatmap" : "Show Heatmap"}
+              ) : showHeatmap ? t("hideHeatmap") : t("showHeatmap")}
             </button>
           </div>
           
           {Object.entries(tourists).length === 0 ? (
             <p className="text-gray-400 italic text-sm">
-              No tourists being monitored currently.
+              {t("noTourists")}
             </p>
           ) : (
             <div className="space-y-3">
@@ -330,19 +332,19 @@ export default function DashboardPage() {
                     <div className="flex justify-between items-start">
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-white truncate">
-                          <span className="font-bold">ID:</span> {id}
+                          <span className="font-bold">{t("id")}</span> {id}
                         </p>
                         {data.username && data.username !== "Unknown" && (
                           <p className="text-sm text-blue-300 truncate">
-                            <span className="font-semibold">User:</span> {data.username}
+                            <span className="font-semibold">{t("user")}</span> {data.username}
                           </p>
                         )}
                         <p className="text-sm text-gray-300">
-                          <span className="font-semibold">Location:</span>{" "}
+                          <span className="font-semibold">{t("location")}</span>{" "}
                           {data.lat.toFixed(4)}, {data.lon.toFixed(4)}
                         </p>
                         <p className="text-sm">
-                          <span className="font-semibold text-gray-200">Status:</span>{" "}
+                          <span className="font-semibold text-gray-200">{t("status")}</span>{" "}
                           <span
                             className={`font-bold ${
                               data.status === "normal"
@@ -359,7 +361,7 @@ export default function DashboardPage() {
                           </span>
                         </p>
                         <p className="text-sm text-gray-400">
-                          Last update: {new Date(data.timestamp).toLocaleTimeString()}
+                          {t("lastUpdate")} {new Date(data.timestamp).toLocaleTimeString()}
                         </p>
                       </div>
                       <div className="flex flex-col items-end gap-2">
@@ -374,11 +376,11 @@ export default function DashboardPage() {
                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                               </svg>
-                              Loading...
+                              {t("loading")}
                             </>
                           ) : (
                             <>
-                              {openLogsId === id ? 'Hide Logs' : 'View Logs'}
+                              {openLogsId === id ? t("hideLogs") : t("viewLogs")}
                               <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 transition-transform ${openLogsId === id ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                               </svg>
@@ -399,11 +401,11 @@ export default function DashboardPage() {
                                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                 </svg>
-                                Resolving...
+                                {t("resolving")}
                               </>
                             ) : (
                               <>
-                                Resolve SOS
+                                {t("resolveSos")}
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                 </svg>
@@ -420,13 +422,13 @@ export default function DashboardPage() {
                     <div className="mt-2 bg-gray-900 rounded-lg p-3 border border-gray-700">
                       <div className="flex justify-between items-center mb-3">
                         <h3 className="font-semibold text-white text-sm">
-                          Activity Logs for {id}
+                          {t("activityLogsFor", { id })}
                         </h3>
                         <span className="text-xs text-gray-400">
-                          {touristLogs[id]?.length || 0} entries
+                          {touristLogs[id]?.length || 0} {t("entries")}
                           {openLogsId === id && (
                             <span className="ml-2 text-green-400 animate-pulse">
-                              ● Live
+                              ● {t("live")}
                             </span>
                           )}
                         </span>
@@ -435,12 +437,12 @@ export default function DashboardPage() {
                       {touristLogs[id]?.length > 0 ? (
                         <div className="max-h-60 overflow-y-auto">
                           <table className="w-full text-xs text-left text-gray-300">
-                            <thead className="text-xs text-gray-400 uppercase bg-gray-800 sticky top极速-0">
+                            <thead className="text-xs text-gray-400 uppercase bg-gray-800 sticky top-0">
                               <tr>
-                                <th className="px-2 py-2">Time</th>
-                                <th className="px-2 py-2">Lat</th>
-                                <th className="px-2 py-2">Lon</th>
-                                <th className="px-2 py-2">Status</th>
+                                <th className="px-2 py-2">{t("time")}</th>
+                                <th className="px-2 py-2">{t("lat")}</th>
+                                <th className="px-2 py-2">{t("lon")}</th>
+                                <th className="px-2 py-2">{t("status")}</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -471,7 +473,7 @@ export default function DashboardPage() {
                         </div>
                       ) : (
                         <p className="text-gray-400 italic text-xs text-center py-4">
-                          No logs available for this tourist.
+                          {t("noLogs")}
                         </p>
                       )}
                     </div>

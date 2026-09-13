@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 interface TouristIdsResponse {
   normal: string[];
@@ -70,6 +71,7 @@ export default function SimulatorPage() {
   const [liveStatuses, setLiveStatuses] = useState<Record<string, any>>({});
   const [currentUser, setCurrentUser] = useState<{id: string, username: string, pathType: string} | null>(null);
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
+  const t = useTranslations("SimulatorPage");
 
   // Get current user from localStorage
   useEffect(() => {
@@ -407,15 +409,15 @@ export default function SimulatorPage() {
         {/* Safety Score Section - Left Side */}
         <div className="w-1/4 bg-gray-800 shadow-lg rounded-xl p-6 text-white">
           <h2 className="text-xl font-bold text-center text-blue-400 mb-6">
-            Safety Score
+            {t("safetyScore")}
           </h2>
           
           {/* Display current user info */}
           {currentUser && (
             <div className="mb-6 p-3 bg-gray-700 rounded-lg">
-              <h3 className="font-semibold text-gray-200 mb-1">Current User</h3>
+              <h3 className="font-semibold text-gray-200 mb-1">{t("currentUser")}</h3>
               <p className="text-sm text-blue-300">{currentUser.username}</p>
-              <p className="text-xs text-gray-400">Path Type: {currentUser.pathType}</p>
+              <p className="text-xs text-gray-400">{t("pathType")} {currentUser.pathType}</p>
             </div>
           )}
           
@@ -454,10 +456,10 @@ export default function SimulatorPage() {
             </div>
             <div className="mt-4 text-center">
               <p className="text-lg font-semibold">
-                {safetyScore >= 80 ? "Excellent" : 
-                 safetyScore >= 60 ? "Good" : 
-                 safetyScore >= 40 ? "Fair" : 
-                 "Poor"} Safety
+                {safetyScore >= 80 ? t("excellentSafety") : 
+                 safetyScore >= 60 ? t("goodSafety") : 
+                 safetyScore >= 40 ? t("fairSafety") : 
+                 t("poorSafety")}
               </p>
             </div>
           </div>
@@ -465,7 +467,7 @@ export default function SimulatorPage() {
           {/* Individual Tourist Scores */}
           {Object.keys(individualScores).length > 0 && (
             <div className="mb-6">
-              <h3 className="font-semibold text-gray-200 mb-3">Tourist Scores</h3>
+              <h3 className="font-semibold text-gray-200 mb-3">{t("touristScores")}</h3>
               <div className="space-y-3 max-h-60 overflow-y-auto">
                 {Object.values(individualScores).map((tourist) => (
                   <div key={tourist.id} className="p-3 bg-gray-700 rounded-lg">
@@ -479,20 +481,20 @@ export default function SimulatorPage() {
                       {liveStatuses[tourist.id]?.username && (
                         <div className="flex items-center">
                           <div className="w-2 h-2 rounded-full mr-2 bg-blue-500"></div>
-                          <span>User: {liveStatuses[tourist.id].username}</span>
+                          <span>{t("user")} {liveStatuses[tourist.id].username}</span>
                         </div>
                       )}
                       <div className="flex items-center">
                         <div className={`w-2 h-2 rounded-full mr-2 ${tourist.lateNight ? 'bg-red-500' : 'bg-green-500'}`}></div>
-                        <span>Late Night: {tourist.lateNight ? 'High Risk' : 'Normal'}</span>
+                        <span>{t("lateNight")} {tourist.lateNight ? t("highRisk") : t("normal")}</span>
                       </div>
                       <div className="flex items-center">
                         <div className={`w-2 h-2 rounded-full mr-2 ${tourist.hasAnomaly ? 'bg-red-500' : 'bg-green-500'}`}></div>
-                        <span>Anomaly: {tourist.hasAnomaly ? 'Detected' : 'None'}</span>
+                        <span>{t("anomalyDetected")} {tourist.hasAnomaly ? t("detected") : t("none")}</span>
                       </div>
                       <div className="flex items-center">
                         <div className={`w-2 h-2 rounded-full mr-2 ${tourist.sosActive ? 'bg-red-500' : 'bg-green-500'}`}></div>
-                        <span>SOS: {tourist.sosActive ? 'Active' : 'None'}</span>
+                        <span>{t("sosActive")} {tourist.sosActive ? t("active") : t("none")}</span>
                       </div>
                     </div>
                   </div>
@@ -503,35 +505,35 @@ export default function SimulatorPage() {
           
           <div className="space-y-4">
             <div className="p-3 bg-gray-700 rounded-lg">
-              <h3 className="font-semibold text-gray-200 mb-1">Late Night Monitoring</h3>
-              <p className="text-sm text-gray-400">Based on current time</p>
+              <h3 className="font-semibold text-gray-200 mb-1">{t("lateNightMonitoring")}</h3>
+              <p className="text-sm text-gray-400">{t("basedOnCurrentTime")}</p>
               <div className="mt-2 flex items-center">
                 <div className={`w-3 h-3 rounded-full mr-2 ${new Date().getHours() >= 22 || new Date().getHours() <= 6 ? 'bg-red-500' : 'bg-green-500'}`}></div>
-                <span>{new Date().getHours() >= 22 || new Date().getHours() <= 6 ? 'High Risk' : 'Normal'}</span>
+                <span>{new Date().getHours() >= 22 || new Date().getHours() <= 6 ? t("highRisk") : t("normal")}</span>
               </div>
             </div>
             
             <div className="p-3 bg-gray-700 rounded-lg">
-              <h3 className="font-semibold text-gray-200 mb-1">Anomaly Detection</h3>
-              <p className="text-sm text-gray-400">Based on selected paths</p>
+              <h3 className="font-semibold text-gray-200 mb-1">{t("anomalyDetection")}</h3>
+              <p className="text-sm text-gray-400">{t("basedOnSelectedPaths")}</p>
               <div className="mt-2">
                 {safetyAlerts.filter(a => a.type === "anomaly").length > 0 ? (
                   <div className="flex items-center">
                     <div className="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
-                    <span>{safetyAlerts.filter(a => a.type === "anomaly").length} anomalous paths</span>
+                    <span>{safetyAlerts.filter(a => a.type === "anomaly").length} {t("anomalousPaths")}</span>
                   </div>
                 ) : (
                   <div className="flex items-center">
                     <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
-                    <span>No anomalies detected</span>
+                    <span>{t("noAnomaliesDetected")}</span>
                   </div>
                 )}
               </div>
             </div>
             
             <div className="p-3 bg-gray-700 rounded-lg">
-              <h3 className="font-semibold text-gray-200 mb-1">SOS Activity</h3>
-              <p className="text-sm text-gray-400">Emergency signals</p>
+              <h3 className="font-semibold text-gray-200 mb-1">{t("sosActivity")}</h3>
+              <p className="text-sm text-gray-400">{t("emergencySignals")}</p>
               <div className="mt-2">
                 {safetyAlerts.filter(a => 
                   a.type === "sos" && 
@@ -543,13 +545,13 @@ export default function SimulatorPage() {
                       {safetyAlerts.filter(a => 
                         a.type === "sos" && 
                         liveStatuses[a.tourist_id]?.status === "sos"
-                      ).length} active SOS
+                      ).length} {t("activeSos")}
                     </span>
                   </div>
                 ) : (
                   <div className="flex items-center">
                     <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
-                    <span>No active SOS</span>
+                    <span>{t("noActiveSos")}</span>
                   </div>
                 )}
               </div>
@@ -560,31 +562,31 @@ export default function SimulatorPage() {
         {/* Mobile App Simulator Section - Middle */}
         <div className="w-2/4 bg-gray-800 shadow-lg rounded-xl p-6 text-white">
           <h1 className="text-2xl font-bold text-center text-blue-400 mb-6">
-            Mobile App Simulator
+            {t("mobileAppSimulator")}
           </h1>
 
           {loading ? (
-            <p className="text-center text-gray-400">Loading tourists...</p>
+            <p className="text-center text-gray-400">{t("loadingTourists")}</p>
           ) : (
             <>
               {/* Tourist Selection */}
               <div className="mb-6">
                 <h2 className="font-semibold text-gray-200 mb-2">
-                  Select Tourist Paths
+                  {t("selectTouristPaths")}
                 </h2>
 
                 <div className="space-y-4">
                   {/* Normal paths dropdown */}
                   <div>
                     <h3 className="text-sm font-medium text-green-400 mb-2">
-                      Normal Paths
+                      {t("normalPaths")}
                     </h3>
                     <select
                       onChange={(e) => handleSelection(e.target.value)}
                       className="w-full bg-gray-700 border border-gray-600 text-white rounded-md p-2"
                       defaultValue=""
                     >
-                      <option value="" disabled>Select a normal path</option>
+                      <option value="" disabled>{t("selectNormalPath")}</option>
                       {tourists.normal.map((id) => (
                         <option key={id} value={`${id}|normal`}>
                           {id}
@@ -596,14 +598,14 @@ export default function SimulatorPage() {
                   {/* Anomalous paths dropdown */}
                   <div>
                     <h3 className="text-sm font-medium text-yellow-400 mb-2">
-                      Anomalous Paths
+                      {t("anomalousPathsLbl")}
                     </h3>
                     <select
                       onChange={(e) => handleSelection(e.target.value)}
                       className="w-full bg-gray-700 border border-gray-600 text-white rounded-md p-2"
                       defaultValue=""
                     >
-                      <option value="" disabled>Select an anomalous path</option>
+                      <option value="" disabled>{t("selectAnomalousPath")}</option>
                       {tourists.anomaly.map((id) => (
                         <option key={id} value={`${id}|anomaly`}>
                           {id}
@@ -617,13 +619,13 @@ export default function SimulatorPage() {
                     <div className="mt-4">
                       <div className="flex justify-between items-center mb-2">
                         <h3 className="text-sm font-medium text-blue-400">
-                          Selected Paths
+                          {t("selectedPaths")}
                         </h3>
                         <button
                           onClick={clearAllSelections}
                           className="text-xs text-red-400 hover:text-red-300"
                         >
-                          Clear All
+                          {t("clearAll")}
                         </button>
                       </div>
                       <div className="bg-gray-700 p-3 rounded-md space-y-2 max-h-40 overflow-y-auto">
@@ -637,7 +639,7 @@ export default function SimulatorPage() {
                                 </span>
                                 {currentUser && (
                                   <div className="text-xs text-blue-300">
-                                    User: {currentUser.username}
+                                    {t("user")} {currentUser.username}
                                   </div>
                                 )}
                               </div>
@@ -645,7 +647,7 @@ export default function SimulatorPage() {
                                 onClick={() => removeSelected(selection)}
                                 className="text-red-400 hover:text-red-300 text-xs"
                               >
-                                Remove
+                                {t("remove")}
                               </button>
                             </div>
                           );
@@ -663,18 +665,18 @@ export default function SimulatorPage() {
                   disabled={selected.length === 0}
                   className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white py-2 px-4 rounded-lg font-medium shadow"
                 >
-                  Start Monitoring {selected.length > 0 && `(${selected.length})`}
+                  {t("startMonitoring")} {selected.length > 0 && `(${selected.length})`}
                 </button>
               </div>
 
               {/* SOS Section */}
               {Object.keys(activeSimulations).length > 0 && (
                 <div className="mb-6 p-4 bg-gray-700 rounded-lg">
-                  <h2 className="font-semibold text-gray-200 mb-3">SOS Controls</h2>
+                  <h2 className="font-semibold text-gray-200 mb-3">{t("sosControls")}</h2>
                   
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-300 mb-1">
-                      Select Tourist for SOS
+                      {t("selectTouristForSos")}
                     </label>
                     <select
                       value={selectedSosTourist}
@@ -694,7 +696,7 @@ export default function SimulatorPage() {
                       onClick={sendSOS}
                       className="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg font-medium shadow"
                     >
-                      Send SOS
+                      {t("sendSos")}
                     </button>
                     <button
                       onClick={resolveSOS}
@@ -705,12 +707,12 @@ export default function SimulatorPage() {
                         <>
                           <svg className="animate-spin h-4 w-4 text-white inline mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 极速12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647极速z"></path>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                           </svg>
-                          Resolving...
+                          {t("resolving")}
                         </>
                       ) : (
-                        "Resolve SOS"
+                        t("resolveSos")
                       )}
                     </button>
                   </div>
@@ -721,7 +723,7 @@ export default function SimulatorPage() {
 
           {/* Status Section */}
           <div className="p-4 bg-gray-700 border border-gray-600 rounded-lg text-center">
-            <h2 className="font-semibold text-gray-200 mb-1">Simulation Status</h2>
+            <h2 className="font-semibold text-gray-200 mb-1">{t("simulationStatus")}</h2>
             <p
               className={`font-medium ${
                 status.includes("Idle")
@@ -743,17 +745,17 @@ export default function SimulatorPage() {
         {/* Safety Alert Section - Right Side */}
         <div className="w-1/4 bg-gray-800 shadow-lg rounded-xl p-6 text-white">
           <h2 className="text-xl font-bold text-center text-blue-400 mb-6">
-            Safety Alerts
+            {t("safetyAlerts")}
           </h2>
           
           <div className="mb-4 flex justify-between items-center">
-            <h3 className="font-semibold text-gray-200">Active Alerts</h3>
+            <h3 className="font-semibold text-gray-200">{t("activeAlerts")}</h3>
             {safetyAlerts.length > 0 && (
               <button 
                 onClick={clearAlerts}
                 className="text-xs text-red-400 hover:text-red-300"
               >
-                Clear All
+                {t("clearAll")}
               </button>
             )}
           </div>
@@ -770,7 +772,7 @@ export default function SimulatorPage() {
                     <div>
                       <p className="text-sm">{alert.message}</p>
                       {alert.username && alert.username !== "Unknown" && (
-                        <p className="text-xs text-blue-300 mt-1">User: {alert.username}</p>
+                        <p className="text-xs text-blue-300 mt-1">{t("user")} {alert.username}</p>
                       )}
                     </div>
                   </div>
@@ -784,8 +786,8 @@ export default function SimulatorPage() {
                 <svg className="w-12 h-12 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
                 </svg>
-                <p>No active alerts</p>
-                <p className="text-xs mt-1">All systems normal</p>
+                <p>{t("noActiveAlerts")}</p>
+                <p className="text-xs mt-1">{t("allSystemsNormal")}</p>
               </div>
             )}
           </div>

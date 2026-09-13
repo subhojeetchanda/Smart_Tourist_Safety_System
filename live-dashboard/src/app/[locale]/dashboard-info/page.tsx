@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import {useLocale, useTranslations} from 'next-intl';
 
 // --- Reusable UI Components ---
 
@@ -74,6 +75,8 @@ const FeatureCard = ({ icon, title, children, className = "" }: FeatureCardProps
 // --- Main Page Component ---
 
 export default function LiveDashboardPage() {
+  const locale = useLocale();
+  const t = useTranslations("DashboardInfo");
   return (
     <main className="min-h-screen bg-slate-900 text-white flex flex-col items-center px-6 py-12 font-sans">
       {/* Radial gradient for a subtle background effect */}
@@ -82,49 +85,49 @@ export default function LiveDashboardPage() {
       {/* Header */}
       <header className="mb-16 text-center">
         <h1 className="text-5xl font-bold mb-3 bg-gradient-to-r from-blue-400 to-teal-300 text-transparent bg-clip-text">
-          Smart Tourist Safety System
+          {t("title")}
         </h1>
         <p className="text-lg text-slate-400">
-          Live Dashboard - Monitoring & Control
+          {t("subtitle")}
         </p>
       </header>
 
       {/* Features Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-7xl">
-        <FeatureCard icon={ICONS.map} title="Live Simulation">
-          <p>View real-time tourist movements and activities on an interactive map.</p>
+        <FeatureCard icon={ICONS.map} title={t("liveSimulation")}>
+          <p>{t("liveSimulationDesc")}</p>
         </FeatureCard>
 
-        <FeatureCard icon={ICONS.logs} title="Tourist Live Logs">
-          <p>Monitor logs of all tourist activities and system interactions as they happen.</p>
+        <FeatureCard icon={ICONS.logs} title={t("touristLiveLogs")}>
+          <p>{t("touristLiveLogsDesc")}</p>
         </FeatureCard>
 
-        <FeatureCard icon={ICONS.heatmap} title="Tourist Heat Map">
-          <p>Analyze tourist density and identify popular hotspots with a dynamic heat map.</p>
+        <FeatureCard icon={ICONS.heatmap} title={t("touristHeatMap")}>
+          <p>{t("touristHeatMapDesc")}</p>
         </FeatureCard>
         
-        <FeatureCard icon={ICONS.alert} title="Alert on Map">
-          <p>Receive real-time anomaly alerts and SOS notifications directly on the map.</p>
+        <FeatureCard icon={ICONS.alert} title={t("alertOnMap")}>
+          <p>{t("alertOnMapDesc")}</p>
         </FeatureCard>
 
-        <FeatureCard icon={ICONS.userAnomaly} title="SOS / Anomaly Log">
-          <p>Highlight tourists in distress with red ripples on the map and detailed log entries.</p>
+        <FeatureCard icon={ICONS.userAnomaly} title={t("sosAnomalyLog")}>
+          <p>{t("sosAnomalyLogDesc")}</p>
         </FeatureCard>
 
-        <FeatureCard icon={ICONS.sos} title="Resolve SOS">
+        <FeatureCard icon={ICONS.sos} title={t("resolveSos")}>
           <button className="w-full mt-2 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 px-4 rounded-lg transition-colors duration-300 flex items-center justify-center space-x-2">
-            <span>Resolve Active SOS</span>
+            <span>{t("resolveActiveSosBtn")}</span>
           </button>
         </FeatureCard>
         
         {/* Government Official Sign In - Spans three columns on large screens */}
         <div className="lg:col-span-3 w-full">
             <section className="bg-slate-800/50 rounded-2xl p-6 shadow-lg border border-slate-700 text-center">
-                <h2 className="text-2xl font-semibold mb-4 text-slate-100">Government Official Access</h2>
-                <p className="text-slate-400 mb-6 max-w-2xl mx-auto">Sign in to access advanced administrative controls, manage alerts, and communicate with security personnel.</p>
-                <Link href="/authentication" className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-colors duration-300 inline-flex items-center space-x-2">
+                <h2 className="text-2xl font-semibold mb-4 text-slate-100">{t("govOfficialAccess")}</h2>
+                <p className="text-slate-400 mb-6 max-w-2xl mx-auto">{t("govOfficialDesc")}</p>
+                <Link href={`/${locale}/authentication`} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-colors duration-300 inline-flex items-center space-x-2">
                     <ICONS.signIn className="w-5 h-5" />
-                    <span>Sign In</span>
+                    <span>{t("signIn")}</span>
                 </Link>
             </section>
         </div>
@@ -132,7 +135,7 @@ export default function LiveDashboardPage() {
 
       {/* Footer */}
       <footer className="mt-20 text-slate-500 text-sm">
-        © {new Date().getFullYear()} Smart Tourist Safety System. All Rights Reserved.
+        {useTranslations("Dashboard")("footer", { year: new Date().getFullYear() })}
       </footer>
     </main>
   );

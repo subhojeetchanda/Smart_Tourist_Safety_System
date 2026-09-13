@@ -13,6 +13,7 @@ import L from 'leaflet';
 import "leaflet/dist/leaflet.css";
 import { LatLngExpression } from "leaflet";
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 // Import heatmap library
 import 'leaflet.heat';
@@ -183,6 +184,7 @@ const generateRegionalHeatmapData = (incidentData: [number, number, number][]) =
 export default function Map({ tourists, showHeatmap, heatmapData }: MapProps) {
   const defaultCenter: LatLngExpression = [27.53, 88.51];
   const [paths, setPaths] = useState<Record<string, LatLngExpression[]>>({});
+  const t = useTranslations("MapComponent");
 
   useEffect(() => {
     // Update paths with new positions
@@ -248,9 +250,9 @@ export default function Map({ tourists, showHeatmap, heatmapData }: MapProps) {
               <div className="text-sm">
                 <b>ID:</b> {id}
                 <br />
-                <b>Status:</b> {data.status}
+                <b>{t("statusLbl")}</b> {data.status}
                 <br />
-                <b>Path points:</b> {paths[id] ? paths[id].length : 0}
+                <b>{t("pathPoints")}</b> {paths[id] ? paths[id].length : 0}
               </div>
             </Tooltip>
           </Marker>

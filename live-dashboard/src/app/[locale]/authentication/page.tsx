@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations, useLocale } from "next-intl";
 
 // --- Firebase Imports ---
 import { initializeApp } from "firebase/app";
@@ -30,6 +31,8 @@ export default function AuthPage() {
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const t = useTranslations("Auth");
+  const locale = useLocale();
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,10 +55,10 @@ export default function AuthPage() {
       const data = await response.json();
 
       if (data.success) {
-        setSuccess('Google Login successful!');
-        setTimeout(() => router.push("/live-map"), 1000);
+        setSuccess(t("loginSuccess"));
+        setTimeout(() => router.push(`/${locale}/live-map`), 1000);
       } else {
-        setError(data.error || 'Login failed');
+        setError(data.error || t("networkError"));
       }
     } catch (err: any) {
       console.error(err);
@@ -88,7 +91,7 @@ export default function AuthPage() {
 
       setSuccess(data.message);
       if (isLogin) {
-        setTimeout(() => router.push("/live-map"), 1000);
+        setTimeout(() => router.push(`/${locale}/live-map`), 1000);
       } else {
         setTimeout(() => {
           setIsLogin(true);
@@ -106,7 +109,7 @@ export default function AuthPage() {
     <div className="min-h-screen flex items-center justify-center bg-[#0f172a] py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-white">{isLogin ? "Welcome Back" : "Create Account"}</h2>
+          <h2 className="text-3xl font-bold text-white">{isLogin ? t("welcomeBack") : "Create Account"}</h2>
         </div>
         
         <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-slate-700/50">
@@ -137,7 +140,7 @@ export default function AuthPage() {
             {success && <div className="p-3 bg-emerald-400/10 border border-emerald-400/20 rounded-lg text-sm text-emerald-300">{success}</div>}
 
             <button type="submit" disabled={loading} className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg font-medium hover:from-blue-600 transition-all">
-              {loading ? "Processing..." : (isLogin ? "Sign in" : "Create Account")}
+              {loading ? t("processing") : (isLogin ? t("signInBtn") : "Create Account")}
             </button>
 
             <div className="text-center">

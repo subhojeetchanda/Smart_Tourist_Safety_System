@@ -319,4 +319,23 @@ app.get("/get_heatmap_data", (req, res) => {
   Object.values(touristLogs).forEach(logs => logs.forEach(l => data.push([l.lat, l.lon, l.status==='sos'?1:l.status==='anomaly'?0.6:0.3])));
   res.json(data);
 });
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+  
+  // --- Render Free Tier Keep-Alive ---
+  // Pings its own /ping endpoint every 14 minutes to prevent the service from sleeping
+  const RENDER_URL = process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
+  
+  // Only start self-pinging if we are in a production-like environment (having an external URL)
+  if (process.env.RENDER_EXTERNAL_URL) {
+    const https = require('https');
+    setInterval(() => {
+      https.get(`${RENDER_URL}/ping`, (resp) => {
+        console.log(`[Self-Ping] Keep-alive ping sent. Status: ${resp.statusCode}`);
+      }).on("error", (err) => {
+        console.log("[Self-Ping] Error: " + err.message);
+      });
+    }, 14 * 60 * 1000); // 14 minutes
+    console.log(`⏰ Self-ping cron job started for ${RENDER_URL}`);
+  }
+});

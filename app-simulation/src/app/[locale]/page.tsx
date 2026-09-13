@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import {useTranslations} from 'next-intl';
 
 // --- Reusable UI Components ---
 
@@ -62,6 +63,8 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ icon, title, children, classN
 // --- Main Page Component ---
 
 export default function AppSimulatorPage() {
+  const t = useTranslations('Simulator');
+
   return (
     <main className="min-h-screen bg-slate-900 text-white flex flex-col items-center px-6 py-12 font-sans">
       {/* Subtle background grid pattern */}
@@ -70,34 +73,34 @@ export default function AppSimulatorPage() {
       {/* Header */}
       <header className="mb-16 text-center">
         <h1 className="text-5xl font-bold mb-3 bg-gradient-to-r from-blue-400 to-teal-300 text-transparent bg-clip-text">
-          Smart Tourist Safety System
+          {t('title')}
         </h1>
-        <p className="text-lg text-slate-400">App Simulator - Landing Page</p>
+        <p className="text-lg text-slate-400">{t('subtitle')}</p>
       </header>
 
       {/* Features Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-5xl">
-        <FeatureCard icon={ICONS.score} title="Live Safety Score">
-          <p className="pl-14">Track real-time safety scores with detailed insights and metrics for any location.</p>
+        <FeatureCard icon={ICONS.score} title={t('liveSafetyScore')}>
+          <p className="pl-14">{t('liveSafetyScoreDesc')}</p>
         </FeatureCard>
 
-        <FeatureCard icon={ICONS.simulation} title="Tourist Simulation">
-          <p className="pl-14">Simulate tourist movement, generate anomalies, and test system responses.</p>
+        <FeatureCard icon={ICONS.simulation} title={t('touristSimulation')}>
+          <p className="pl-14">{t('touristSimulationDesc')}</p>
         </FeatureCard>
 
-        <FeatureCard icon={ICONS.alert} title="On-Screen Alerts">
-          <p className="pl-14">Receive instant, high-visibility alerts on-screen whenever SOS or anomalies are detected.</p>
+        <FeatureCard icon={ICONS.alert} title={t('onScreenAlerts')}>
+          <p className="pl-14">{t('onScreenAlertsDesc')}</p>
         </FeatureCard>
 
-        <FeatureCard icon={ICONS.sos} title="Raise & Resolve SOS">
+        <FeatureCard icon={ICONS.sos} title={t('raiseResolveSOS')}>
             {/* The content in this card is pushed to the bottom */}
            <div className="flex-grow flex items-end pl-14">
                 <div className="flex flex-col sm:flex-row gap-4 w-full">
                     <button className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 px-4 rounded-lg transition-colors duration-300">
-                    Raise SOS
+                    {t('raiseSOS')}
                     </button>
                     <button className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 px-4 rounded-lg transition-colors duration-300">
-                    Resolve SOS
+                    {t('resolveSOS')}
                     </button>
                 </div>
            </div>
@@ -105,15 +108,15 @@ export default function AppSimulatorPage() {
 
         {/* User Registration & Login - Spans full width */}
         <div className="md:col-span-2">
-            <FeatureCard icon={ICONS.userAuth} title="User Registration & Login">
+            <FeatureCard icon={ICONS.userAuth} title={t('userAuth')}>
                 <div className="pl-14">
-                    <p className="mb-6">Access the tourist mobile application by registering for a new account or logging in with existing credentials.</p>
+                    <p className="mb-6">{t('userAuthDesc')}</p>
                     <div className="flex flex-col sm:flex-row gap-4">
                         <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-colors duration-300">
-                        Register
+                        {t('register')}
                         </button>
                         <button className="bg-slate-600 hover:bg-slate-700 text-white font-bold py-3 px-8 rounded-lg transition-colors duration-300">
-                        Login
+                        {t('login')}
                         </button>
                     </div>
                 </div>
@@ -123,7 +126,7 @@ export default function AppSimulatorPage() {
 
       {/* Footer */}
       <footer className="mt-20 text-slate-500 text-sm">
-        © {new Date().getFullYear()} Smart Tourist Safety System. All Rights Reserved.
+        {t('footer', { year: new Date().getFullYear() })}
       </footer>
     </main>
   );
