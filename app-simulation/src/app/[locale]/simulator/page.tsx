@@ -763,14 +763,23 @@ export default function SimulatorPage() {
           <div className="space-y-4 max-h-96 overflow-y-auto">
             {safetyAlerts.length > 0 ? (
               safetyAlerts.map((alert, index) => (
-                <div 
+                  <div 
                   key={index} 
-                  className={`p-3 rounded-lg ${alert.type === "sos" ? 'bg-red-900 border border-red-700' : 'bg-yellow-900 border border-yellow-700'}`}
+                  className={`p-3 rounded-lg ${
+                    alert.type === "efir" ? 'bg-red-950 border-2 border-red-500 animate-pulse' :
+                    alert.type === "sos" ? 'bg-red-900 border border-red-700' : 
+                    'bg-yellow-900 border border-yellow-700'
+                  }`}
                 >
                   <div className="flex items-start">
-                    <div className={`w-4 h-4 rounded-full mr-2 mt-1 ${alert.type === "sos" ? 'bg-red-500' : 'bg-yellow-500'}`}></div>
+                    <div className={`w-4 h-4 rounded-full mr-2 mt-1 ${
+                      alert.type === "efir" ? 'bg-red-500 shadow-[0_0_10px_red]' :
+                      alert.type === "sos" ? 'bg-red-500' : 'bg-yellow-500'
+                    }`}></div>
                     <div>
-                      <p className="text-sm">{alert.message}</p>
+                      <p className={`text-sm ${alert.type === "efir" ? 'font-bold text-red-400' : ''}`}>
+                        {alert.message}
+                      </p>
                       {alert.username && alert.username !== "Unknown" && (
                         <p className="text-xs text-blue-300 mt-1">{t("user")} {alert.username}</p>
                       )}

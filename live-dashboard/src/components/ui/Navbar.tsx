@@ -16,6 +16,7 @@ export default function Navbar() {
     { href: `/${locale}`, label: t('home') },
     { href: `/${locale}/about`, label: t('about') },
     { href: `/${locale}/authentication`, label: t('dashboard') },
+    { href: `/${locale}/efir-reports`, label: "E-FIR Reports" },
     { href: `/${locale}/contact`, label: t('contact') },
   ];
 

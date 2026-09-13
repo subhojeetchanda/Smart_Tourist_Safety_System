@@ -33,6 +33,7 @@ admin.initializeApp({
 const db = admin.firestore();
 const USERS_COLLECTION = "live_dashboard_users";
 const AUTH_USERS_COLLECTION = "app_simulator_users";
+const EFIR_COLLECTION = "efir_reports";
 
 const app = express();
 const PORT = 5001;
@@ -54,6 +55,7 @@ let touristLogs = {};
 let safetyAlerts = [];
 let anomalyDetectedTourists = new Set();
 let touristToUserMap = {}; 
+let generatedEfirs = new Set(); // Track tourists who already got an EFIR
 
 function addLogEntry(touristId, lat, lon, status) {
   if (!touristLogs[touristId]) touristLogs[touristId] = [];
@@ -239,7 +241,7 @@ app.post("/auth/login", async (req, res) => {
 app.get("/", (req, res) => res.send("<h1>Server Running (Firebase + Google Auth)</h1>"));
 app.get("/ping", (req, res) => res.status(200).json({ status: "alive", message: "Keeping Render awake!", timestamp: new Date().toISOString() }));
 app.get("/reset_simulation", (req, res) => {
-  liveTouristData = {}; touristLogs = {}; safetyAlerts = []; anomalyDetectedTourists = new Set(); touristToUserMap = {};
+  liveTouristData = {}; touristLogs = {}; safetyAlerts = []; anomalyDetectedTourists = new Set(); touristToUserMap = {}; generatedEfirs = new Set();
   res.json({ status: "Simulation reset" });
 });
 app.get("/get_tourist_ids", (req, res) => {
@@ -258,7 +260,15 @@ app.post("/get_path", (req, res) => {
   if (type && type !== actualType) return res.status(400).json({ error: "Path type mismatch" });
 
   const coords = pathData.map((r) => ({ lat: parseFloat(r.lat), lon: parseFloat(r.lon) }));
-  liveTouristData[tourist_id] = { lat: coords[0].lat, lon: coords[0].lon, status: "normal", path_type: actualType, username: username || "Unknown", timestamp: new Date().toISOString() };
+  liveTouristData[tourist_id] = { 
+    lat: coords[0].lat, 
+    lon: coords[0].lon, 
+    status: "normal", 
+    path_type: actualType, 
+    username: username || "Unknown", 
+    timestamp: new Date().toISOString(),
+    lastStatusChangeTime: Date.now()
+  };
   if (username) touristToUserMap[tourist_id] = username;
   addLogEntry(tourist_id, coords[0].lat, coords[0].lon, "normal");
   res.json({ tourist_id: tourist_id, path_type: actualType, path: coords });
@@ -267,7 +277,12 @@ app.post("/update_location", (req, res) => {
   const { tourist_id, lat, lon, status = "normal" } = req.body;
   if (liveTouristData[tourist_id]) {
     liveTouristData[tourist_id].lat = lat; liveTouristData[tourist_id].lon = lon;
-    if (liveTouristData[tourist_id].status !== "sos") liveTouristData[tourist_id].status = status;
+    if (liveTouristData[tourist_id].status !== "sos") {
+      if (liveTouristData[tourist_id].status !== status) {
+        liveTouristData[tourist_id].status = status;
+        liveTouristData[tourist_id].lastStatusChangeTime = Date.now();
+      }
+    }
     addLogEntry(tourist_id, lat, lon, liveTouristData[tourist_id].status);
   }
   res.json({ status: "updated" });
@@ -276,13 +291,20 @@ app.post("/predict", (req, res) => {
   const { tourist_id, path_type, path = [] } = req.body;
   if (liveTouristData[tourist_id] && liveTouristData[tourist_id].status !== "sos") {
     if (path_type === "anomaly" && path.length > 30) {
-      liveTouristData[tourist_id].status = "anomaly";
+      if (liveTouristData[tourist_id].status !== "anomaly") {
+        liveTouristData[tourist_id].status = "anomaly";
+        liveTouristData[tourist_id].lastStatusChangeTime = Date.now();
+      }
       if (!anomalyDetectedTourists.has(tourist_id)) {
         safetyAlerts.push({ message: "Wrong path detected!", timestamp: new Date().toISOString(), type: "anomaly", tourist_id, username: touristToUserMap[tourist_id] || "Unknown" });
         anomalyDetectedTourists.add(tourist_id);
       }
     } else {
-      liveTouristData[tourist_id].status = "normal";
+      if (liveTouristData[tourist_id].status !== "normal") {
+        liveTouristData[tourist_id].status = "normal";
+        liveTouristData[tourist_id].lastStatusChangeTime = Date.now();
+        generatedEfirs.delete(tourist_id); // Reset if they return to normal
+      }
     }
     addLogEntry(tourist_id, liveTouristData[tourist_id].lat, liveTouristData[tourist_id].lon, liveTouristData[tourist_id].status);
   }
@@ -291,7 +313,7 @@ app.post("/predict", (req, res) => {
 app.post("/sos", (req, res) => {
   const { tourist_id, lat, lon } = req.body;
   console.log(`🚨 SOS: ${tourist_id}`);
-  liveTouristData[tourist_id] = { lat, lon, status: "sos", username: touristToUserMap[tourist_id] || "Unknown", timestamp: new Date().toISOString() };
+  liveTouristData[tourist_id] = { lat, lon, status: "sos", username: touristToUserMap[tourist_id] || "Unknown", timestamp: new Date().toISOString(), lastStatusChangeTime: Date.now() };
   addLogEntry(tourist_id, lat, lon, "sos");
   safetyAlerts.push({ message: "SOS Raised!", timestamp: new Date().toISOString(), type: "sos", tourist_id, username: touristToUserMap[tourist_id] || "Unknown" });
   res.json({ status: "SOS Received" });
@@ -300,6 +322,8 @@ app.post("/resolve_sos", (req, res) => {
   const { tourist_id } = req.body;
   if (liveTouristData[tourist_id]) {
     liveTouristData[tourist_id].status = "normal";
+    liveTouristData[tourist_id].lastStatusChangeTime = Date.now();
+    generatedEfirs.delete(tourist_id); // Reset
     addLogEntry(tourist_id, liveTouristData[tourist_id].lat, liveTouristData[tourist_id].lon, "normal");
   }
   res.json({ status: "SOS Resolved" });
@@ -319,6 +343,79 @@ app.get("/get_heatmap_data", (req, res) => {
   Object.values(touristLogs).forEach(logs => logs.forEach(l => data.push([l.lat, l.lon, l.status==='sos'?1:l.status==='anomaly'?0.6:0.3])));
   res.json(data);
 });
+
+// --- Automated E-FIR Endpoint & Cron logic ---
+app.get("/get_efir_reports", async (req, res) => {
+  try {
+    const snapshot = await db.collection(EFIR_COLLECTION).orderBy("createdAt", "desc").get();
+    const reports = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    res.json(reports);
+  } catch (error) {
+    console.error("Error fetching EFIR reports:", error);
+    res.status(500).json({ error: "Failed to fetch EFIR reports" });
+  }
+});
+
+// Automated E-FIR background task
+setInterval(async () => {
+  const now = Date.now();
+  for (const [tourist_id, data] of Object.entries(liveTouristData)) {
+    // If in SOS or Anomaly for > 30 seconds
+    if ((data.status === "sos" || data.status === "anomaly") && 
+        data.lastStatusChangeTime && 
+        (now - data.lastStatusChangeTime) > 30000) {
+      
+      if (!generatedEfirs.has(tourist_id)) {
+        generatedEfirs.add(tourist_id);
+        const username = data.username;
+        console.log(`🚨 Triggering Automated E-FIR for ${username} (${tourist_id})`);
+        
+        try {
+          // Fetch user details from DB
+          const userSnap = await db.collection(AUTH_USERS_COLLECTION).where("username", "==", username).get();
+          let victimDetails = { username, phone: "N/A", aadhaarNumber: "N/A", dateOfBirth: "N/A", email: "N/A" };
+          
+          if (!userSnap.empty) {
+            victimDetails = userSnap.docs[0].data();
+          }
+
+          const firId = `FIR-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+          
+          const efirReport = {
+            firId: firId,
+            touristId: tourist_id,
+            victimName: victimDetails.username,
+            victimPhone: victimDetails.phone,
+            victimEmail: victimDetails.email,
+            aadhaarNumber: victimDetails.aadhaarNumber,
+            dateOfBirth: victimDetails.dateOfBirth,
+            lastKnownLat: data.lat,
+            lastKnownLon: data.lon,
+            reason: data.status === "sos" ? "Prolonged SOS distress signal" : "Prolonged anomalous path deviation",
+            createdAt: new Date().toISOString(),
+            status: "Filed"
+          };
+
+          // Save to Firestore
+          await db.collection(EFIR_COLLECTION).doc(firId).set(efirReport);
+          
+          // Push alert to dashboard
+          safetyAlerts.push({ 
+            message: `AUTOMATED E-FIR FILED: ${firId}`, 
+            timestamp: new Date().toISOString(), 
+            type: "efir", 
+            tourist_id, 
+            username 
+          });
+
+          console.log(`✅ E-FIR ${firId} filed successfully in Firestore.`);
+        } catch (error) {
+          console.error(`❌ Failed to file E-FIR for ${username}:`, error);
+        }
+      }
+    }
+  }
+}, 5000); // Check every 5 seconds
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   
